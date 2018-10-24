@@ -2,3 +2,4 @@
 lib/oldhit.js
 *.zip
 *.cmd
+client/ip.js

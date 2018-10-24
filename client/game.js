@@ -124,8 +124,10 @@ var Game = (function() {
 					temp.vel.x = update.vel.x;
 					temp.vel.y = update.vel.y;
 				} else {
-					var temp = Player.createNet(update.box, update.vel, 4, 2, world.power, world, Utils.getHSL(195, 100, 50));
-					obj[update.id] = temp;
+					if (update.type == OBJECT_TYPE.PLAYER) {
+						var temp = Player.createNet(update.box, update.vel, 4, 2, world.power, world, update.color || Utils.getHSL(195, 100, 50));
+						obj[update.id] = temp;
+					}
 				}
 			}
 		}

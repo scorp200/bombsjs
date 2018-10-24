@@ -1,13 +1,21 @@
 var Canvas = document.getElementById("c");
 var ctx = Canvas.getContext("2d", { alpha: false });
-
+var Mouse = { x: 0, y: 0, vx: 0, vy: 0, down: false };
 window.addEventListener("mousemove", function(e) {
 	var rect = Canvas.getBoundingClientRect();
-	x = e.clientX - rect.left;
-	y = e.clientY - rect.top;
-	vx = (x - Canvas.width / 2);
-	vy = (y - Canvas.height / 2);
+	Mouse.x = e.clientX - rect.left;
+	Mouse.y = e.clientY - rect.top;
+	Mouse.vx = (Mouse.x - Canvas.width / 2);
+	Mouse.vy = (Mouse.y - Canvas.height / 2);
 }, false);
+window.addEventListener("mousedown", function(e) {
+	Mouse.down = true;
+}, false);
+window.addEventListener("mouseup", function(e) {
+	Mouse.down = false;
+}, false);
+
+
 
 window.addEventListener("contextmenu", function(e) {
 	//e.preventDefault();
@@ -22,6 +30,9 @@ function resize() {
 	ctx.clearRect(0, 0, Canvas.width, Canvas.height);
 };
 
+var game = null;
+var gameState = 0;
+
 function sendToServer(data) {
 	try {
 		socket.send(JSON.stringify(data));
@@ -30,32 +41,33 @@ function sendToServer(data) {
 	}
 }
 
-var game = null //Game.createLocalGame();
-var socket = null;
-var con = new WebSocket('ws://localhost:8667');
-con.onopen = function() {
-	socket = con;
-	sendToServer({
-		join: { random: true }
-	});
-}
+function connect() {
+	window.socket = null;
+	var con = new WebSocket(ip || 'ws://localhost:8667');
+	con.onopen = function() {
+		socket = con;
+		sendToServer({
+			join: { random: true }
+		});
+	}
 
-con.onerror = function(err) {
-	console.log('Socket error: ' + err);
-}
+	con.onerror = function(err) {
+		console.log('Socket error: ' + err);
+	}
 
-con.onclose = function(err) {
-	console.log('socket closed');
-	socket = null;
-	game = null;
-}
+	con.onclose = function(err) {
+		console.log('socket closed');
+		socket = null;
+		game = null;
+	}
 
-con.onmessage = function(msg) {
-	var data = JSON.parse(msg.data);
-	if (data.world)
-		game = Game.createNetGame(data);
-	else if (data.updates)
-		game.updateNet(data.updates);
+	con.onmessage = function(msg) {
+		var data = JSON.parse(msg.data);
+		if (data.world)
+			game = Game.createNetGame(data);
+		else if (data.updates)
+			game.updateNet(data.updates);
+	}
 }
 
 var lastTick = performance.now();
@@ -78,11 +90,15 @@ window.onload = function() {
 }
 
 function update() {
-	if (game)
+	if (gameState == 0)
+		Menu.update();
+	else if (gameState == 1 && game)
 		game.update();
 }
 
 function render() {
-	if (game)
+	if (gameState == 0)
+		Menu.render();
+	else if (gameState == 1 && game)
 		game.render();
 }

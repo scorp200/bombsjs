@@ -37,7 +37,8 @@ module.exports = function(clients, lobby) {
 	function updateClients() {
 		var updates = [];
 		for (var x = 0, i = obj.length; x < i; x++) {
-			updates.push({ box: obj[x].box, vel: obj[x].vel, id: x, type: obj.type });
+			var temp = obj[x];
+			updates.push({ box: temp.box, vel: temp.vel, id: x, type: temp.type, color: temp.color });
 		}
 		for (var i = 0, u = clients.length; i < u; i++) {
 			sendToClient(clients[i], { updates: updates });
