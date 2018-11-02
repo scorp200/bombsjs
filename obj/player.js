@@ -6,22 +6,27 @@ var Player = (function() {
 		Bomb = require('./bomb.js');
 	}
 
-	function createNet(box, vel, speed, slipSpeed, power, world, color) {
+	function createNet(box, vel, speed, slipSpeed, power, world, color, id) {
 		var collider = GridCollider.create(box, slipSpeed, 0.01, power, world);
 		var isDead = false;
 		var index = 0;
+		var newBox = Utils.createBox(box.x, box.y, box.w, box.h);
 
 		function update(dt) {
+			box.x += Utils.ease(box.x, newBox.x, 3);
+			box.y += Utils.ease(box.y, newBox.y, 3);
 			collider.move(vel, dt);
 			world.updatePosition(player);
 		}
 
 		var player = {
 			box: box,
+			newBox: newBox,
 			vel: vel,
 			update: update,
 			color: color,
 			get local() { return false },
+			get id() { return id },
 			get isDead() { return isDead },
 			set isDead(val) { isDead = val },
 			get index() { return index },
@@ -32,13 +37,16 @@ var Player = (function() {
 		return player;
 	}
 
-	function createLocal(box, speed, slipSpeed, keys, power, world, obj, color) {
+	function createLocal(box, speed, slipSpeed, keys, power, world, obj, color, id) {
 		var vel = Utils.Vector2D(0, 0);
 		var collider = GridCollider.create(box, slipSpeed, 0.01, power, world);
 		var bombKey = false;
 		var isDead = false;
 		var index = 0;
 		var powerups = Powerups.getDefauls();
+		var _id;
+		if (id)
+			_id = id.id++;
 
 		function update(dt) {
 			var upspeed = speed + powerups[POWER_UPS.SPEED] * 0.7;
@@ -50,7 +58,7 @@ var Player = (function() {
 			else vel.x = 0;
 			if (keys[4].down && !bombKey) {
 				bombKey = true;
-				Bomb.place((box.x + box.w / 2) >> power, (box.y + box.h / 2) >> power, 3, power, world, obj);
+				Bomb.create((box.x + box.w / 2) >> power, (box.y + box.h / 2) >> power, 3, power, world, obj, false, id);
 			} else if (!keys[4].down) bombKey = false;
 			collider.move(vel, dt);
 			world.updatePosition(player);
@@ -64,6 +72,7 @@ var Player = (function() {
 			color: color,
 			powerups: powerups,
 			get local() { return true },
+			get id() { return _id },
 			get isDead() { return isDead },
 			set isDead(val) { isDead = val },
 			get index() { return index },

@@ -43,7 +43,7 @@ function sendToServer(data) {
 
 function connect() {
 	window.socket = null;
-	var con = new WebSocket(ip || 'ws://localhost:8667');
+	var con = new WebSocket(ip ? ip : 'ws://localhost:8667');
 	con.onopen = function() {
 		socket = con;
 		sendToServer({
@@ -66,7 +66,7 @@ function connect() {
 		if (data.world)
 			game = Game.createNetGame(data);
 		else if (data.updates)
-			game.updateNet(data.updates);
+			game.updates.push(data.updates);
 	}
 }
 

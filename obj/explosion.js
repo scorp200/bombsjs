@@ -1,10 +1,15 @@
 var server = typeof module !== "undefined";
 var Explosion = (function() {
-	function place(x, y, power, world, obj) {
+	function create(x, y, power, world, obj, net, id) {
 		var explosiontimer = 50;
 		var isDead = false;
 		var index = 0;
 		var box = Utils.createBox(x << power, y << power, world.size, world.size);
+		var _id;
+		if (!net && id)
+			_id = id.id++;
+		else if (id)
+			_id = id;
 
 		function update() {
 			if (--explosiontimer <= 0)
@@ -13,19 +18,26 @@ var Explosion = (function() {
 			for (var i = 0, u = objects.length; i < u; i++) {
 				var obj = objects[i];
 				if (obj.type == OBJECT_TYPE.PLAYER && Utils.boxIntersectObject(box, obj.box)) {
-					obj.color = Utils.getHSL(-1, 100, 50);
+					if (!net)
+						obj.color = Utils.getHSL(-1, 100, 50);
 				} else if (obj.type == OBJECT_TYPE.BOMB && Utils.boxIntersectObject(box, obj.box)) {
-					obj.explode();
+					obj.bombTimer = 0;
 				}
 			}
-
 		}
 
 		var explosion = {
 			update: update,
 			box: box,
+			get id() { return _id },
 			get isDead() { return isDead },
-			set isDead(val) { isDead = val },
+			set isDead(val) {
+				if (server && val)
+					updates.push({ remove: _id });
+				isDead = val
+			},
+			get explosiontimer() { return explosiontimer },
+			set explosiontimer(val) { explosiontimer = val },
 			get index() { return index },
 			set index(val) { index = val },
 			type: OBJECT_TYPE.EXPLOSION
@@ -41,7 +53,7 @@ var Explosion = (function() {
 	}
 
 	return {
-		place: place,
+		create: create,
 		draw: draw
 	}
 })();

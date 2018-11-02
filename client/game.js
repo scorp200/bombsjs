@@ -24,7 +24,6 @@ var Game = (function() {
 		var world = World.generateWorld(6);
 		var color = [Utils.getHSL(100, 0, 50), Utils.getHSL(90, 100, 50), Utils.getHSL(200, 100, 50), undefined];
 		var obj = [];
-
 		var keys = [
 			{ key: 'ArrowUp', down: false },
 			{ key: 'ArrowDown', down: false },
@@ -92,6 +91,8 @@ var Game = (function() {
 		var world = Grid.create(world.world, world.width, world.height, world.size, world.power);
 		var color = [Utils.getHSL(100, 0, 50), Utils.getHSL(90, 100, 50), Utils.getHSL(200, 100, 50), undefined];
 		var obj = [];
+		var objHolder = {};
+		var updates = [];
 		var keys = [
 			{ key: 'ArrowUp', down: false },
 			{ key: 'ArrowDown', down: false },
@@ -100,34 +101,91 @@ var Game = (function() {
 			{ key: ' ', down: false },
 			{ key: 'z', down: false }
 		];
+		var sendrate = 3;
 
 		function update() {
 			for (var i = 0, u = obj.length; i < u; i++) {
-				obj[i].update(1);
+				if (obj[i])
+					obj[i].update(1);
 			}
 			obj.forEach(function(e, i) {
-				if (e.isDead) {
+				if (e && e.isDead) {
+					objHolder[e.id] = void 0;
 					obj[i] = obj[obj.length - 1];
 					obj.length--;
+
 				}
 			});
-			sendToServer({ keys: keys });
+			for (var i = 0, u = updates.length; i < u; i++) {
+				updateNet(updates[i]);
+			}
+			updates.length = 0;
+			if (sendrate-- <= 0) {
+				sendToServer({ keys: keys });
+				sendrate = 3;
+			}
 		}
 
 		function updateNet(updates) {
 			for (var i = 0, u = updates.length; i < u; i++) {
 				var update = updates[i];
-				if (obj[update.id]) {
-					var temp = obj[update.id];
-					temp.box.x += Utils.ease(temp.box.x, update.box.x, 5, 0.01);
-					temp.box.y += Utils.ease(temp.box.y, update.box.y, 5, 0.01);
-					temp.vel.x = update.vel.x;
-					temp.vel.y = update.vel.y;
-				} else {
-					if (update.type == OBJECT_TYPE.PLAYER) {
-						var temp = Player.createNet(update.box, update.vel, 4, 2, world.power, world, update.color || Utils.getHSL(195, 100, 50));
-						obj[update.id] = temp;
+				if (update.remove) {
+					objHolder[update.remove].isDead = true;
+				} else if (update.object) {
+					update = update.object;
+					if (objHolder[update.id]) {
+						var temp = objHolder[update.id];
+						temp.newBox.x = update.box.x;
+						temp.newBox.y = update.box.y;
+						temp.vel.x = update.vel.x;
+						temp.vel.y = update.vel.y;
+						temp.color = update.color;
+						temp.isDead = (update.isDead != undefined);
+						/*
+						if (temp.type == OBJECT_TYPE.PLAYER) {
+							temp.newBox.x = update.box.x;
+							temp.newBox.y = update.box.y;
+							temp.vel.x = update.vel.x;
+							temp.vel.y = update.vel.y;
+							temp.color = update.color;
+						} else if (temp.type == OBJECT_TYPE.BOMB) {
+							temp.newBox.x = update.box.x;
+							temp.newBox.y = update.box.y;
+							try {
+								temp.vel.x = update.vel.x;
+								temp.vel.y = update.vel.y;
+							} catch (e) {
+								console.log(temp, update);
+							}
+
+							temp.bombTimer = update.bombTimer;
+						} else if (temp.type == OBJECT_TYPE.EXPLOSION) {
+							temp.explosiontimer = update.explosiontimer;
+						}*/
+					} else {
+						var newobj = NetObject.create(update.color, update.box, world.power, world, update.id);
+						objHolder[update.id] = newobj;
+						obj.push(newobj);
+						/*switch (update.type) {
+							case OBJECT_TYPE.PLAYER:
+								objHolder[update.id] = Player.createNet(update.box, update.vel, 4, 2, world.power, world, update.color || Utils.getHSL(195, 100, 50), update.id);
+								obj.push(objHolder[update.id]);
+								break;
+							case OBJECT_TYPE.BOMB:
+								objHolder[update.id] = Bomb.create(update.box.x >> world.power, update.box.y >> world.power, update.level, world.power, world, obj, true, update.id);
+								obj.push(objHolder[update.id]);
+								break;
+							case OBJECT_TYPE.EXPLOSION:
+								objHolder[update.id] = Explosion.create(update.box.x >> world.power, update.box.y >> world.power, world.power, world, obj, true, update.id);
+								obj.push(objHolder[update.id]);
+								break;
+							default:
+
+						}*/
 					}
+				} else if (update.cell) {
+					update = update.cell;
+					world.setCellAt(update.x, update.y, update.id);
 				}
 			}
 		}
@@ -138,7 +196,10 @@ var Game = (function() {
 			ctx.beginPath();
 			for (var i = 0, u = obj.length; i < u; i++) {
 				var p = obj[i];
-				switch (p.type) {
+				if (p == undefined)
+					continue;
+				NetObject.draw(p);
+				/*switch (p.type) {
 					case OBJECT_TYPE.PLAYER:
 						Player.draw(p);
 						break;
@@ -151,13 +212,14 @@ var Game = (function() {
 					case OBJECT_TYPE.POWERUP:
 						Powerups.draw(p);
 						break;
-				}
+				}*/
 			}
 		}
 
 		return {
 			update: update,
-			updateNet: updateNet,
+			updates: updates,
+			//updateNet: updateNet,
 			render: render
 		}
 	}
