@@ -31,6 +31,7 @@ module.exports = function(clients, lobby) {
 		}
 		obj.forEach(function(e, i) {
 			if (e.isDead) {
+				updates.push({ remove: e.id });
 				obj[i] = obj[obj.length - 1];
 				obj.length--;
 			}
@@ -44,7 +45,7 @@ module.exports = function(clients, lobby) {
 	function updateClients() {
 		for (var x = 0, i = obj.length; x < i; x++) {
 			var temp = obj[x];
-			updates.push({ object: { box: temp.box, vel: temp.vel, id: temp.id, color: temp.color } });
+			updates.push({ update: { box: temp.box, vel: temp.vel, id: temp.id, color: temp.color, type: temp.type } });
 			/*switch (temp.type) {
 				case OBJECT_TYPE.PLAYER:
 					updates.push({ object: { box: temp.box, vel: temp.vel, id: temp.id, type: temp.type, color: temp.color } });

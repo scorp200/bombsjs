@@ -58,7 +58,7 @@ var Player = (function() {
 			else vel.x = 0;
 			if (keys[4].down && !bombKey) {
 				bombKey = true;
-				Bomb.create((box.x + box.w / 2) >> power, (box.y + box.h / 2) >> power, 3, power, world, obj, false, id);
+				Bomb.create((box.x + box.w / 2) >> power, (box.y + box.h / 2) >> power, 3, power, world, obj, id);
 			} else if (!keys[4].down) bombKey = false;
 			collider.move(vel, dt);
 			world.updatePosition(player);

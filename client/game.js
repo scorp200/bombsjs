@@ -109,11 +109,10 @@ var Game = (function() {
 					obj[i].update(1);
 			}
 			obj.forEach(function(e, i) {
-				if (e && e.isDead) {
+				if (e.isDead) {
 					objHolder[e.id] = void 0;
 					obj[i] = obj[obj.length - 1];
 					obj.length--;
-
 				}
 			});
 			for (var i = 0, u = updates.length; i < u; i++) {
@@ -129,59 +128,26 @@ var Game = (function() {
 		function updateNet(updates) {
 			for (var i = 0, u = updates.length; i < u; i++) {
 				var update = updates[i];
-				if (update.remove) {
+				if (update.remove && objHolder[update.remove]) {
 					objHolder[update.remove].isDead = true;
-				} else if (update.object) {
-					update = update.object;
+				} else if (update.update &&) {
+					update = update.update;
 					if (objHolder[update.id]) {
 						var temp = objHolder[update.id];
-						temp.newBox.x = update.box.x;
-						temp.newBox.y = update.box.y;
-						temp.vel.x = update.vel.x;
-						temp.vel.y = update.vel.y;
-						temp.color = update.color;
-						temp.isDead = (update.isDead != undefined);
-						/*
-						if (temp.type == OBJECT_TYPE.PLAYER) {
+						if (update.box) {
 							temp.newBox.x = update.box.x;
 							temp.newBox.y = update.box.y;
+						}
+						if (update.vel) {
 							temp.vel.x = update.vel.x;
 							temp.vel.y = update.vel.y;
+						}
+						if (update.color)
 							temp.color = update.color;
-						} else if (temp.type == OBJECT_TYPE.BOMB) {
-							temp.newBox.x = update.box.x;
-							temp.newBox.y = update.box.y;
-							try {
-								temp.vel.x = update.vel.x;
-								temp.vel.y = update.vel.y;
-							} catch (e) {
-								console.log(temp, update);
-							}
-
-							temp.bombTimer = update.bombTimer;
-						} else if (temp.type == OBJECT_TYPE.EXPLOSION) {
-							temp.explosiontimer = update.explosiontimer;
-						}*/
 					} else {
-						var newobj = NetObject.create(update.color, update.box, world.power, world, update.id);
+						var newobj = NetObject.create(update.color, update.box, world.power, world, update.id, update.type);
 						objHolder[update.id] = newobj;
 						obj.push(newobj);
-						/*switch (update.type) {
-							case OBJECT_TYPE.PLAYER:
-								objHolder[update.id] = Player.createNet(update.box, update.vel, 4, 2, world.power, world, update.color || Utils.getHSL(195, 100, 50), update.id);
-								obj.push(objHolder[update.id]);
-								break;
-							case OBJECT_TYPE.BOMB:
-								objHolder[update.id] = Bomb.create(update.box.x >> world.power, update.box.y >> world.power, update.level, world.power, world, obj, true, update.id);
-								obj.push(objHolder[update.id]);
-								break;
-							case OBJECT_TYPE.EXPLOSION:
-								objHolder[update.id] = Explosion.create(update.box.x >> world.power, update.box.y >> world.power, world.power, world, obj, true, update.id);
-								obj.push(objHolder[update.id]);
-								break;
-							default:
-
-						}*/
 					}
 				} else if (update.cell) {
 					update = update.cell;
@@ -198,8 +164,7 @@ var Game = (function() {
 				var p = obj[i];
 				if (p == undefined)
 					continue;
-				NetObject.draw(p);
-				/*switch (p.type) {
+				switch (p.drawType) {
 					case OBJECT_TYPE.PLAYER:
 						Player.draw(p);
 						break;
@@ -212,14 +177,13 @@ var Game = (function() {
 					case OBJECT_TYPE.POWERUP:
 						Powerups.draw(p);
 						break;
-				}*/
+				}
 			}
 		}
 
 		return {
 			update: update,
 			updates: updates,
-			//updateNet: updateNet,
 			render: render
 		}
 	}

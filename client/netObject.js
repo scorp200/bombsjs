@@ -1,5 +1,5 @@
 var NetObject = (function() {
-	function create(color, box, power, world, id) {
+	function create(color, box, power, world, id, drawType) {
 		var vel = Utils.Vector2D(0, 0);
 		var newBox = Utils.createBox(box.x, box.y, box.w, box.h);
 		var collider = GridCollider.create(box, 0, 0.01, power, world);
@@ -20,7 +20,8 @@ var NetObject = (function() {
 			vel: vel,
 			newBox: newBox,
 			color: color,
-			get id() { return id },
+			id: id,
+			drawType: drawType,
 			get isDead() { return isDead },
 			set isDead(val) { isDead = val },
 			get index() { return index },
