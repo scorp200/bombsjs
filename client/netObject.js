@@ -2,7 +2,7 @@ var NetObject = (function() {
 	function create(color, box, power, world, id, drawType) {
 		var vel = Utils.Vector2D(0, 0);
 		var newBox = Utils.createBox(box.x, box.y, box.w, box.h);
-		var collider = GridCollider.create(box, 0, 0.01, power, world);
+		var collider = GridCollider.create(box, 2, 0.01, power, world);
 		var isDead = false;
 		var _id;
 		var index = 0;

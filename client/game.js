@@ -130,7 +130,7 @@ var Game = (function() {
 				var update = updates[i];
 				if (update.remove && objHolder[update.remove]) {
 					objHolder[update.remove].isDead = true;
-				} else if (update.update &&) {
+				} else if (update.update) {
 					update = update.update;
 					if (objHolder[update.id]) {
 						var temp = objHolder[update.id];

@@ -11,8 +11,6 @@ global.sendToClient = function(conn, data) {
 }
 var clients = [];
 var port = 8667;
-//var game = new Game(6, clients);
-Lobby.createLobby();
 var server = new ws.Server({
 	port: port
 }, function() {
@@ -25,7 +23,6 @@ server.on('connection', function(conn) {
 	conn.id = cid;
 	conn.keys = getKeys();
 	clients[cid] = conn;
-	//sendToClient(conn, { world: game.world, start: game.startPos[cid] });
 	conn.on('message', function(msg) {
 		var data = JSON.parse(msg);
 		if (data.keys) {
