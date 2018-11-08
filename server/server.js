@@ -17,7 +17,7 @@ var server = new ws.Server({
 	console.log('Websockets server up on port ' + port);
 });
 server.on('connection', function(conn) {
-	var cid = ArrayIndexOf(clients, undefined);
+	var cid = Utils.indexOf(clients, undefined);
 	cid = cid == -1 ? clients.length : cid;
 	console.log('Client ' + cid + ' has connected');
 	conn.id = cid;
@@ -42,19 +42,6 @@ server.on('connection', function(conn) {
 		console.log('Client ' + cid + ' has left.')
 	});
 });
-
-/**
- * array.indexOf that can find undefined VALUES
- * @param {array} arr
- * @param {*} what
- */
-ArrayIndexOf = function(arr, what) {
-	for (var i = 0, last = arr.length; i < last; i++) {
-		if (arr[i] === what)
-			return i;
-	}
-	return -1;
-}
 
 function getKeys() {
 	return [

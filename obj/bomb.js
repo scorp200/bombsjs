@@ -8,7 +8,7 @@ var Bomb = (function() {
 
 	function create(x, y, level, power, world, obj, id) {
 		var cell = world.getCellAt(x, y);
-		if (cell == 0) {
+		if (cell == WORLD_INDEX.FLOOR) {
 			//world.setCellAt(x, y, 3,updates);
 			var vel = Utils.Vector2D(0, 0);
 			var bombTimer = 100;
@@ -23,7 +23,7 @@ var Bomb = (function() {
 			function update(dt, updates) {
 				var x = (box.x + box.w / 2) >> power;
 				var y = (box.y + box.h / 2) >> power;
-				if (world.getCellAt(x, y) != 3) {
+				if (world.getCellAt(x, y) != WORLD_INDEX.BOMB) {
 					var objects = world.getObjectsNearby(bomb);
 					var change = true;
 					for (var i = 0, u = objects.length; i < u; i++) {
@@ -34,10 +34,10 @@ var Bomb = (function() {
 						}
 					}
 					if (change)
-						world.setCellAt(x, y, 3,updates);
+						world.setCellAt(x, y, WORLD_INDEX.BOMB, updates);
 				}
 				if (--bombTimer <= 0) {
-					world.setCellAt(x, y, 0,updates);
+					world.setCellAt(x, y, WORLD_INDEX.FLOOR, updates);
 					bomb.isDead = true;
 					//up
 					for (var i = 0; - i < level; i--) {
@@ -62,11 +62,11 @@ var Bomb = (function() {
 
 			function explode(x, y, updates) {
 				var cell = world.getCellAt(x, y);
-				if (cell == 1)
+				if (WORLD_INDEX.ISWALL(cell))
 					return true;
 				Explosion.create(x, y, power, world, obj, id);
-				if (cell == 2) {
-					world.setCellAt(x, y, 0, updates);
+				if (cell == WORLD_INDEX.CRATE) {
+					world.setCellAt(x, y, WORLD_INDEX.FLOOR, updates);
 					//Powerups.spawnPowerUp(x, y, 0, power, world, obj);
 					return true;
 				}
@@ -95,7 +95,10 @@ var Bomb = (function() {
 	function draw(bomb) {
 		ctx.fillStyle = Utils.getHSL(165, 100, 50);
 		var box = bomb.box;
-		ctx.fillRect(box.x, box.y, box.w, box.h);
+		if (sprites) {
+			sprites.draw(ctx, 'bomb', box.x, box.y);
+		} else
+			ctx.fillRect(box.x, box.y, box.w, box.h);
 	}
 
 	return {

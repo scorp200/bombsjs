@@ -1,5 +1,23 @@
 var Canvas = document.getElementById("c");
 var ctx = Canvas.getContext("2d", { alpha: false });
+var sprites = Sprite.create(5, 2, 64, 64, 'sprites.png');
+//Walls
+sprites.addIndex(0, 4, 0);
+sprites.addIndex(1, 1, 0);
+sprites.addIndex(2, 2, 1);
+sprites.addIndex(3, 3, 1);
+sprites.addIndex(4, 2, 2);
+sprites.addIndex(5, 3, 2);
+sprites.addIndex(6, 4, 1);
+sprites.addIndex(7, 1, 2);
+//Crate
+sprites.addIndex(8, 3, 0);
+sprites.addIndex(9, 4, 0);
+sprites.addIndex('bomb', 4, 2);
+sprites.addIndex('player',5,0)
+// 9 = BOMB
+
+
 var Mouse = { x: 0, y: 0, vx: 0, vy: 0, down: false };
 window.addEventListener("mousemove", function(e) {
 	var rect = Canvas.getBoundingClientRect();

@@ -103,6 +103,8 @@ var Game = (function() {
 		];
 		var sendrate = 3;
 
+
+
 		function update() {
 			for (var i = 0, u = obj.length; i < u; i++) {
 				if (obj[i])

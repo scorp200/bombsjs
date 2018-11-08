@@ -1,0 +1,11 @@
+- powerups
+- check out:
+TypeError: Cannot read property 'objects' of undefined
+at Object.updatePosition (/home/doge/bombsjs/lib/gridmap.js:25:31)
+at Object.update (/home/doge/bombsjs/obj/player.js:66:10)
+at update (/home/doge/bombsjs/server/lib/games.js:47:11)
+at Timeout.tick [as _onTimeout] (/home/doge/bombsjs/server/lib/games.js:37:3)
+at ontimeout (timers.js:427:11)
+at tryOnTimeout (timers.js:289:5)
+at listOnTimeout (timers.js:252:5)
+at Timer.processTimers (timers.js:212:10)

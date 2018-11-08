@@ -87,7 +87,10 @@ var Player = (function() {
 	function draw(player) {
 		ctx.fillStyle = player.color;
 		var box = player.box;
-		ctx.fillRect(box.x, box.y, box.w, box.h);
+		if (false) {
+			sprites.draw(ctx, 'player', box.x, box.y);
+		} else
+			ctx.fillRect(box.x, box.y, box.w, box.h);
 	}
 
 	return {
