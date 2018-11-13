@@ -33,11 +33,11 @@ var Game = (function() {
 			{ key: 'z', down: false }
 		];
 
-		Player.createLocal(Utils.createBox(world.size, world.size, world.size, world.size), 4, 2, keys, world.power, world, obj, Utils.getHSL(178, 100, 50));
+		Player.createLocal(Utils.createBox(world.size, world.size, world.size, world.size), 3, 1, keys, world.power, world, obj, Utils.getHSL(178, 100, 50));
 
-		function update() {
+		function update(dt) {
 			for (var i = 0, u = obj.length; i < u; i++) {
-				obj[i].update(1);
+				obj[i].update(dt);
 			}
 			obj.forEach(function(e, i) {
 				if (e.isDead) {
@@ -101,11 +101,10 @@ var Game = (function() {
 			{ key: ' ', down: false },
 			{ key: 'z', down: false }
 		];
-		var sendrate = 3;
+		var sendTick = 0;
 
 
-
-		function update() {
+		function update(dt) {
 			for (var i = 0, u = obj.length; i < u; i++) {
 				if (obj[i])
 					obj[i].update(1);
@@ -121,9 +120,11 @@ var Game = (function() {
 				updateNet(updates[i]);
 			}
 			updates.length = 0;
-			if (sendrate-- <= 0) {
+			sendTick += dt;
+			if (sendTick > 2) {
+				console.log(sendTick * 10);
 				sendToServer({ keys: keys });
-				sendrate = 3;
+				sendTick = 2;
 			}
 		}
 

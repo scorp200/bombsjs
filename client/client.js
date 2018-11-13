@@ -1,6 +1,7 @@
 var Canvas = document.getElementById("c");
 var ctx = Canvas.getContext("2d", { alpha: false });
 var sprites = Sprite.create(5, 2, 64, 64, 'sprites.png');
+var scaleMultiplayer;
 //Walls
 sprites.addIndex(0, 4, 0);
 sprites.addIndex(1, 1, 0);
@@ -14,15 +15,15 @@ sprites.addIndex(7, 1, 2);
 sprites.addIndex(8, 3, 0);
 sprites.addIndex(9, 4, 0);
 sprites.addIndex('bomb', 4, 2);
-sprites.addIndex('player',5,0)
+sprites.addIndex('player', 5, 0)
 // 9 = BOMB
 
 
 var Mouse = { x: 0, y: 0, vx: 0, vy: 0, down: false };
 window.addEventListener("mousemove", function(e) {
 	var rect = Canvas.getBoundingClientRect();
-	Mouse.x = e.clientX - rect.left;
-	Mouse.y = e.clientY - rect.top;
+	Mouse.x = (e.clientX - rect.left) / scaleMultiplayer;
+	Mouse.y = (e.clientY - rect.top) / scaleMultiplayer;
 	Mouse.vx = (Mouse.x - Canvas.width / 2);
 	Mouse.vy = (Mouse.y - Canvas.height / 2);
 }, false);
@@ -45,6 +46,8 @@ window.addEventListener("resize", resize, false);
 function resize() {
 	Canvas.width = window.innerWidth;
 	Canvas.height = window.innerHeight;
+	scaleMultiplayer = window.innerHeight / (64 * 13);
+	ctx.scale(scaleMultiplayer, scaleMultiplayer);
 	ctx.clearRect(0, 0, Canvas.width, Canvas.height);
 };
 
@@ -88,7 +91,39 @@ function connect() {
 	}
 }
 
+var tickInterval = 1000 / 64;
+var sendTick = 0;
 var lastTick = performance.now();
+
+window.onload = function() {
+	tick(lastTick);
+}
+
+function tick(now) {
+	requestAnimationFrame(tick);
+	var dt = now - lastTick;
+	if (dt > tickInterval) {
+		update(dt);
+		render();
+		lastTick = now;
+	}
+}
+
+function update(dt) {
+	if (gameState == 0)
+		Menu.update();
+	else if (gameState == 1 && game)
+		game.update(dt / 10);
+}
+
+function render() {
+	if (gameState == 0)
+		Menu.render();
+	else if (gameState == 1 && game)
+		game.render();
+}
+
+/*var lastTick = performance.now();
 var tickInterval = 1000 / 64;
 window.onload = function() {
 	(function tick(timeStamp) {
@@ -106,17 +141,4 @@ window.onload = function() {
 		}
 	})(lastTick);
 }
-
-function update() {
-	if (gameState == 0)
-		Menu.update();
-	else if (gameState == 1 && game)
-		game.update();
-}
-
-function render() {
-	if (gameState == 0)
-		Menu.render();
-	else if (gameState == 1 && game)
-		game.render();
-}
+*/

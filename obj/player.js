@@ -44,6 +44,7 @@ var Player = (function() {
 		var isDead = false;
 		var index = 0;
 		var powerups = Powerups.getDefauls();
+		var ignore = { bomb: undefined, index: undefined };
 		var _id;
 		if (id)
 			_id = id.id++;
@@ -56,11 +57,16 @@ var Player = (function() {
 			if (keys[2].down) vel.x = -upspeed;
 			else if (keys[3].down) vel.x = upspeed;
 			else vel.x = 0;
+			if (ignore.bomb && !Utils.boxIntersectObject(box, ignore.bomb.box))
+				ignore.index = ignore.bomb = undefined;
 			if (keys[4].down && !bombKey) {
 				bombKey = true;
-				Bomb.create((box.x + box.w / 2) >> power, (box.y + box.h / 2) >> power, 3, power, world, obj, id);
+				var bx = (box.x + box.w / 2) >> power;
+				var by = (box.y + box.h / 2) >> power
+				ignore.index = world.getIndex(bx, by);
+				ignore.bomb = Bomb.create(bx, by, 3, power, world, obj, id);
 			} else if (!keys[4].down) bombKey = false;
-			collider.move(vel, dt);
+			collider.move(vel, dt, ignore.index);
 			world.updatePosition(player);
 		}
 

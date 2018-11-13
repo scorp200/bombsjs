@@ -9,7 +9,7 @@ var Bomb = (function() {
 	function create(x, y, level, power, world, obj, id) {
 		var cell = world.getCellAt(x, y);
 		if (cell == WORLD_INDEX.FLOOR) {
-			//world.setCellAt(x, y, 3,updates);
+			//world.setCellAt(x, y, WORLD_INDEX.BOMB, updates);
 			var vel = Utils.Vector2D(0, 0);
 			var bombTimer = 100;
 			var box = Utils.createBox(x << power, y << power, world.size, world.size);
@@ -25,20 +25,19 @@ var Bomb = (function() {
 				var y = (box.y + box.h / 2) >> power;
 				if (world.getCellAt(x, y) != WORLD_INDEX.BOMB) {
 					var objects = world.getObjectsNearby(bomb);
-					var change = true;
 					for (var i = 0, u = objects.length; i < u; i++) {
 						var obj = objects[i];
 						if (obj.type == OBJECT_TYPE.PLAYER && Utils.boxIntersectObject(box, obj.box)) {
-							change = false;
 							vel.x = vel.y = 0;
+							box.x = Math.round(box.x);
+							box.y = Math.round(box.y);
 						}
 					}
-					if (change)
-						world.setCellAt(x, y, WORLD_INDEX.BOMB, updates);
+					world.setCellAt(x, y, WORLD_INDEX.BOMB, updates);
 				}
 				if (--bombTimer <= 0) {
 					world.setCellAt(x, y, WORLD_INDEX.FLOOR, updates);
-					bomb.isDead = true;
+					isDead = true;
 					//up
 					for (var i = 0; - i < level; i--) {
 						if (explode(x, y + i, updates)) break;
@@ -89,6 +88,7 @@ var Bomb = (function() {
 			}
 			world.updatePosition(bomb);
 			obj.push(bomb);
+			return bomb;
 		}
 	}
 
