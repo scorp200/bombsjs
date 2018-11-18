@@ -49,7 +49,10 @@ var Game = (function() {
 
 		function render() {
 			ctx.clearRect(0, 0, Canvas.width, Canvas.height);
-			Grid.draw(ctx, world, color);
+			ctx.webkitImageSmoothingEnabled = false;
+			ctx.mozImageSmoothingEnabled = false;
+			ctx.imageSmoothingEnabled = false; 
+			World.draw(ctx, world, color);
 			ctx.beginPath();
 			for (var i = 0, u = obj.length; i < u; i++) {
 				var p = obj[i];
@@ -161,7 +164,7 @@ var Game = (function() {
 
 		function render() {
 			ctx.clearRect(0, 0, Canvas.width, Canvas.height);
-			Grid.draw(ctx, world, color);
+			World.draw(ctx, world, color);
 			ctx.beginPath();
 			for (var i = 0, u = obj.length; i < u; i++) {
 				var p = obj[i];

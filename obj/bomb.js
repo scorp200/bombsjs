@@ -96,7 +96,7 @@ var Bomb = (function() {
 		ctx.fillStyle = Utils.getHSL(165, 100, 50);
 		var box = bomb.box;
 		if (sprites) {
-			sprites.draw(ctx, 'bomb', box.x, box.y);
+			sprites.drawSprite(ctx, 'bomb', box.x, box.y);
 		} else
 			ctx.fillRect(box.x, box.y, box.w, box.h);
 	}

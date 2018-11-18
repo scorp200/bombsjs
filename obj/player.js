@@ -94,7 +94,7 @@ var Player = (function() {
 		ctx.fillStyle = player.color;
 		var box = player.box;
 		if (false) {
-			sprites.draw(ctx, 'player', box.x, box.y);
+			sprites.drawSprite(ctx, 'player', box.x, box.y);
 		} else
 			ctx.fillRect(box.x, box.y, box.w, box.h);
 	}

@@ -46,7 +46,7 @@ window.addEventListener("resize", resize, false);
 function resize() {
 	Canvas.width = window.innerWidth;
 	Canvas.height = window.innerHeight;
-	scaleMultiplayer = window.innerHeight / (64 * 13);
+	scaleMultiplayer = Canvas.height * 0.8 / (64 * 13);
 	ctx.scale(scaleMultiplayer, scaleMultiplayer);
 	ctx.clearRect(0, 0, Canvas.width, Canvas.height);
 };
